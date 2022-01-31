@@ -5,7 +5,8 @@ from copy import copy
 from typing import Any, Iterator, Type, Optional, Collection, Dict
 
 from lark.exceptions import UnexpectedCharacters, UnexpectedToken, LexError
-from lark.lexer import CallChain, _create_unless, TerminalDef, _regexp_has_newline, TOKEN_DEFAULT_PRIORITY, Pattern
+from lark.lexer import CallChain, _create_unless, TerminalDef, _regexp_has_newline, Pattern
+from lark.grammar import TOKEN_DEFAULT_PRIORITY
 
 
 ctypedef fused Token_or_str:
@@ -177,7 +178,7 @@ cdef class Lexer:
     #def lex(self, lexer_state: LexerState, parser_state: Any) -> Iterator[Token]:
     #    return NotImplemented
 
-    cdef make_lexer_state(self, str text):
+    cpdef make_lexer_state(self, str text):
         line_ctr = LineCounter(b'\n' if isinstance(text, bytes) else '\n')
         return LexerState(text, line_ctr)
 
@@ -258,7 +259,7 @@ cdef class BasicLexer(Lexer):
     #        while True:
     #            yield self.next_token(state, parser_state)
 
-    cdef public next_token(self, LexerState lex_state, ParserState parser_state):
+    cpdef public next_token(self, LexerState lex_state, ParserState parser_state):
         cdef LineCounter line_ctr = lex_state.line_ctr
         cdef str value
         cdef str type_

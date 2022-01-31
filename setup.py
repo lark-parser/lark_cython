@@ -18,12 +18,12 @@ except ImportError:
 
 setup(
     name = "lark-cython",
-    version = "0.0.6",
+    version = "0.0.7",
     packages=find_packages(),
 
     ext_modules = cythonize('lark_cython/*.pyx'), # accepts a glob pattern
     requires = ['Cython'],
-    install_requires = ['lark', 'cython', 'Cython'],
+    install_requires = ['lark>=1.1.0', 'cython>=0.29.0', 'Cython>=0.29.0'],
     setup_requires=['Cython'],
 
     author = "Erez Shinan",
