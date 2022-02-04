@@ -1,6 +1,6 @@
 ---
 name: Question
-about: Ask a question about Lark or request help
+about: Ask a question about Lark-Cython or request help
 title: ''
 labels: question
 assignees: ''
