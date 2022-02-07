@@ -1,8 +1,12 @@
 # Lark-Cython
 
-Cython plugin for Lark, reimplementing the LALR parser &amp; lexer for better performance on CPython.
+Cython plugin for [Lark](https://github.com/lark-parser/lark), reimplementing the LALR parser &amp; lexer for better performance on CPython.
 
-**WIP**
+Install:
+
+```python
+pip install lark-cython
+```
 
 Usage:
 
@@ -13,6 +17,9 @@ parser = Lark(grammar, parser="lalr", _plugins=lark_cython.plugins)
 
 # Use Lark as you usually would, with a huge performance boost
 ```
+
+See the [examples](https://github.com/lark-parser/lark_cython/tree/master/examples) for more.
+
 
 ## Differences from Lark
 
