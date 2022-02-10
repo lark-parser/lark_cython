@@ -18,7 +18,7 @@ except ImportError:
 
 setup(
     name = "lark-cython",
-    version = "0.0.7",
+    version = __version__,
     packages=find_packages(),
 
     ext_modules = cythonize('lark_cython/*.pyx'), # accepts a glob pattern
