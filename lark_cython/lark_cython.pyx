@@ -51,14 +51,21 @@ cdef class Token:
     def __repr__(self):
         return 'Token(%r, %r)' % (self.type, self.value)
 
+    def __str__(self):
+        return self.value
+
     cdef __deepcopy__(self, memo):
         return Token(self.type, self.value, self.start_pos, self.line, self.column)
 
-    def __eq__(self, Token_or_str other):
-        if isinstance(other, Token) and self.type != other.type:
-            return False
+    def __eq__(self, other):
+        if isinstance(other, Token):
+            return self.type == other.type and self.value == other.value
 
-        return str.__eq__(self, other)
+        if isinstance(other, str):
+            return self.value == other
+
+        return NotImplemented
+
 
     def __hash__(self):
         return hash(self.value)
@@ -384,8 +391,8 @@ from lark.exceptions import UnexpectedCharacters, UnexpectedInput, UnexpectedTok
 cdef class ParseConf:
     __slots__ = 'parse_table', 'callbacks', 'start', 'start_state', 'end_state', 'states'
 
-    cdef parse_table
-    cdef int start_state, end_state
+    cdef public parse_table
+    cdef public int start_state, end_state
     cdef dict states, callbacks
     cdef str start
 
@@ -403,9 +410,9 @@ cdef class ParseConf:
 cdef class ParserState:
     __slots__ = 'parse_conf', 'lexer', 'state_stack', 'value_stack'
 
-    cdef ParseConf parse_conf
-    cdef LexerThread lexer   # LexerThread
-    cdef list value_stack, state_stack
+    cdef public ParseConf parse_conf
+    cdef public LexerThread lexer   # LexerThread
+    cdef public list value_stack, state_stack
 
     def __init__(self, parse_conf, lexer, state_stack=None, value_stack=None):
         self.parse_conf = parse_conf
