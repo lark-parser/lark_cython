@@ -34,7 +34,7 @@ cdef class Token:
         self.end_column = end_column
         self.end_pos = end_pos
 
-    cdef update(self, type_: Optional[str]=None, value: Optional[Any]=None):
+    cpdef update(self, type_: Optional[str]=None, value: Optional[Any]=None):
         return Token.new_borrow_pos(
             type_ if type_ is not None else self.type,
             value if value is not None else self.value,
@@ -45,7 +45,7 @@ cdef class Token:
     def new_borrow_pos(cls, type_: str, value: Any, borrow_t: 'Token'):
         return cls(type_, value, borrow_t.start_pos, borrow_t.line, borrow_t.column, borrow_t.end_line, borrow_t.end_column, borrow_t.end_pos)
 
-    cdef __reduce__(self):
+    def __reduce__(self):
         return (self.__class__, (self.type, self.value, self.start_pos, self.line, self.column))
 
     def __repr__(self):
@@ -77,7 +77,7 @@ cdef class LexerState:
     cdef public LineCounter line_ctr
     cdef public object last_token
 
-    def __cinit__(self, text, line_ctr, last_token=None):
+    def __init__(self, text, line_ctr, last_token=None):
         self.text = text
         self.line_ctr = line_ctr
         self.last_token = last_token
@@ -90,6 +90,8 @@ cdef class LexerState:
 
     cdef __copy__(self):
         return type(self)(self.text, copy(self.line_ctr), self.last_token)
+
+    _Token = Token
 
 cdef class LineCounter:
     __slots__ = 'char_pos', 'line', 'column', 'line_start_pos', 'newline_char'
@@ -190,7 +192,7 @@ cdef class Lexer:
         return LexerState(text, line_ctr)
 
     cpdef make_lexer_thread(self, str text):
-        return LexerThread(self, text)
+        return LexerThread.from_text(self, text)
 
 cdef class BasicLexer(Lexer):
 
@@ -362,20 +364,21 @@ cdef class LexerThread:
     """A thread that ties a lexer instance and a lexer state, to be used by the parser"""
 
     cdef Lexer lexer
-    cdef object state
+    cdef LexerState state
 
-    def __cinit__(self, lexer, text):
+    def __init__(self, lexer, LexerState lexer_state):
         self.lexer = lexer
-        self.state = lexer.make_lexer_state(text)
+        self.state = lexer_state
 
-    cdef next_token(self, ParserState parser_state):
+    @classmethod
+    def from_text(cls, lexer, text):
+        return cls(lexer, lexer.make_lexer_state(text))
+
+    def next_token(self, ParserState parser_state):
         return self.lexer.next_token(self.state, parser_state)
 
     def __copy__(self):
-        copied = object.__new__(LexerThread)
-        copied.lexer = self.lexer
-        copied.state = copy(self.state)
-        return copied
+        return type(self)(self.lexer, copy(self.state))
 
 ####
 
@@ -411,7 +414,7 @@ cdef class ParserState:
     __slots__ = 'parse_conf', 'lexer', 'state_stack', 'value_stack'
 
     cdef public ParseConf parse_conf
-    cdef public LexerThread lexer   # LexerThread
+    cdef public object lexer   # LexerThread
     cdef public list value_stack, state_stack
 
     def __init__(self, parse_conf, lexer, state_stack=None, value_stack=None):
@@ -441,7 +444,7 @@ cdef class ParserState:
     def copy(self):
         return copy(self)
 
-    cdef feed_token(self, Token token, bint is_end=False):
+    cpdef feed_token(self, Token token, bint is_end=False):
         cdef:
             list state_stack = self.state_stack
             list value_stack = self.value_stack
@@ -463,7 +466,8 @@ cdef class ParserState:
             try:
                 action, arg = states[state][token.type]
             except KeyError:
-                expected = {s for s in states[state].keys() if s.isupper()}
+                # expected = {s for s in states[state].keys() if s.isupper()}
+                expected = set(filter(str.isupper, states[state].keys()))
                 raise UnexpectedToken(token, expected, state=self, interactive_parser=None)
 
             assert arg != end_state
@@ -513,7 +517,7 @@ cdef class _Parser:
         return self.parse_from_state(parser_state)
     
 
-    cdef parse_from_state(self, ParserState state):
+    cpdef parse_from_state(self, ParserState state):
         # Main LALR-parser loop
         cdef Token token
         cdef Token end_token
