@@ -151,7 +151,6 @@ def benchmark():
     # Data in long-form makes it very easy to use seaborn.
     data = pd.DataFrame(rows)
     data = data.sort_values(time_key)
-    print(data)
 
     if RECORD_ALL:
         # Show the min / mean if we record all
@@ -159,8 +158,32 @@ def benchmark():
         mean_times = data.groupby('key')[['time']].mean().rename({'time': 'mean'}, axis=1)
         stats_data = pd.concat([min_times, mean_times], axis=1)
         stats_data = stats_data.sort_values('min')
-        print('Statistics:')
-        print(stats_data)
+    else:
+        stats_data = data
+    print('Statistics:')
+    print(stats_data)
+
+    if 1:
+        # Measure speedup
+        groups = stats_data.groupby('method')
+        other_keys = sorted(set(stats_data.columns) - {'key', 'method', 'min', 'mean', 'hue_key', 'size_key', 'style_key'})
+        indexed_groups = {}
+        for key, group in dict(list(groups)).items():
+            indexed_group = group.set_index(other_keys)
+            indexed_groups[key] = indexed_group
+        cy_data = indexed_groups['parse_cython']
+        py_data = indexed_groups['parse_python']
+        speedup_mean = py_data['mean'] / cy_data['mean']
+        speedup_min = py_data['min'] / cy_data['min']
+        cy_data['speedup_mean'] = speedup_mean
+        cy_data['speedup_min'] = speedup_min
+        average_mean_speedup = cy_data['speedup_mean'].mean()
+        average_min_speedup = cy_data['speedup_min'].mean()
+        print('Speedup:')
+        print(cy_data)
+        print('Average speedup')
+        average_speedup = cy_data[['speedup_mean', 'speedup_min']].describe().T
+        print(average_speedup.drop('count', axis=1))
 
     plot = True
     if plot:
@@ -182,7 +205,8 @@ def benchmark():
         fig.clf()
         ax = fig.gca()
         sns.lineplot(data=data, x=xlabel, y=time_key, marker='o', ax=ax, **plotkw)
-        ax.set_title('Benchmark Python Grammar')
+
+        ax.set_title(f'Benchmark Grammar: {grammar_fpath.name}\nAverage Speedup: {average_speedup.loc["speedup_mean", "mean"]:0.4f}x')
         ax.set_xlabel('Input Size')
         ax.set_ylabel('Time (seconds)')
         # ax.set_xscale('log')
