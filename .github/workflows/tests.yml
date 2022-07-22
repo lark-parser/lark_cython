@@ -34,22 +34,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
+        cibw_skip: ["*-win32"]
+        arch: [auto]
         include:
         - os: windows-latest
           arch: auto
-        - os: ubuntu-latest
-          arch: auto
-        - os: macOS-latest
-          arch: auto
+          cibw_skip: '*-win_amd64'
     steps:
     - name: Checkout source
       uses: actions/checkout@v3
     - name: Enable MSVC 64bit
       uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && matrix.cibw_build != 'cp3*-win32'
+      if: matrix.os == 'windows-latest' && matrix.cibw_skip == '*-win32'
     - name: Enable MSVC 32bit
       uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && matrix.cibw_build == 'cp3*-win32'
+      if: matrix.os == 'windows-latest' && matrix.cibw_skip == '*-win_amd64'
       with:
         arch: x86
     - name: Install Xcode
@@ -70,6 +70,7 @@ jobs:
       env:
         CIBW_BUILD_VERBOSITY: 1
         #CIBW_TEST_COMMAND: pytest
+        CIBW_SKIP: ${{ matrix.cibw_skip }}
         CIBW_ARCHS_LINUX: ${{ matrix.arch }}
     - name: Show built files
       shell: bash
