@@ -1,0 +1,8 @@
+build/
+*.egg-info/
+lark_cython/__pycache__/
+lark_cython/lark_cython.c
+lark_cython/lark_cython.*.so
+lark_cython/lark_cython.html
+__pycache__
+wheelhouse
