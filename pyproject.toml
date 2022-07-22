@@ -1,3 +1,12 @@
 [build-system]
 requires = ["setuptools", "wheel", "Cython>=0.29.1"]
 build-backend = "setuptools.build_meta"
+
+
+[tool.cibuildwheel]
+build = "cp36-* cp37-* cp38-* cp39-* cp310-*"
+build-frontend = "build"
+#skip = "pp* *-musllinux_* *-win32"
+build-verbosity = 1
+test-requires = [ "-r requirements/tests.txt",]
+test-command = "python {project}/run_tests.py"
