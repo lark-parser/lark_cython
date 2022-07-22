@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [tool.cibuildwheel]
-build = "cp36-* cp37-* cp38-* cp39-* cp310-*"
+build = "*p36-* *p37-* *p38-* *p39-* *p310-*"
 build-frontend = "build"
 #skip = "pp* *-musllinux_* *-win32"
 build-verbosity = 1
