@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9, 3.10.0-rc - 3.10, pypy3]
+        python-version: [3.6, 3.7, 3.8, 3.9, "3.10", pypy3]
 
     steps:
       - uses: actions/checkout@v2
@@ -28,3 +28,74 @@ jobs:
       - name: Run tests
         run: |
           pytest
+
+  build_binary_wheels:
+    name: ${{ matrix.os }}, arch=${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
+        cibw_skip: ["*-win32"]
+        arch: [auto]
+        include:
+        - os: windows-latest
+          arch: auto
+          cibw_skip: '*-win_amd64'
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v3
+    - name: Enable MSVC 64bit
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest' && matrix.cibw_skip == '*-win32'
+    - name: Enable MSVC 32bit
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest' && matrix.cibw_skip == '*-win_amd64'
+      with:
+        arch: x86
+    #- name: Set up QEMU
+    #  uses: docker/setup-qemu-action@v2
+    #  if: runner.os == 'Linux' && matrix.arch != 'auto'
+    #  with:
+    #    platforms: all
+    - name: Build binary wheels
+      uses: pypa/cibuildwheel@v2.8.1
+      with:
+        output-dir: wheelhouse
+        config-file: pyproject.toml
+      env:
+        CIBW_BUILD_VERBOSITY: 1
+        #CIBW_TEST_COMMAND: pytest
+        CIBW_SKIP: ${{ matrix.cibw_skip }}
+        CIBW_ARCHS_LINUX: ${{ matrix.arch }}
+    - name: Show built files
+      shell: bash
+      run: ls -la wheelhouse
+    - name: Set up Python 3.8 to combine coverage Linux
+      uses: actions/setup-python@v4
+      if: runner.os == 'Linux'
+      with:
+        python-version: 3.8
+    - name: Combine coverage Linux
+      if: runner.os == 'Linux'
+      run: |-
+        echo '############ PWD'
+        pwd
+        cp .wheelhouse/.coverage* . || true
+        ls -al
+        python -m pip install coverage[toml]
+        echo '############ combine'
+        coverage combine . || true
+        echo '############ XML'
+        coverage xml -o ./tests/coverage.xml || true
+        echo '############ FIND'
+        find . -name .coverage.* || true
+        find . -name coverage.xml  || true
+    - uses: codecov/codecov-action@v3
+      name: Codecov Upload
+      with:
+        file: ./tests/coverage.xml
+    - uses: actions/upload-artifact@v3
+      name: Upload wheels artifact
+      with:
+        name: wheels
+        path: ./wheelhouse/*.whl
