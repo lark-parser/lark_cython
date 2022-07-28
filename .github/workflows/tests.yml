@@ -49,6 +49,7 @@ jobs:
     - name: Install sdist
       run: |-
         ls -al ./wheelhouse
+        pip install pytest
         pip install Cython
         pip install wheelhouse/*.tar.gz -v
     - name: Test sdist
