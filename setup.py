@@ -5,8 +5,6 @@ __version__ ,= re.findall('__version__ = "(.*)"', open('lark_cython/__init__.py'
 
 # python .\setup.py build_ext --inplace
 
-from distutils.core import setup
-
 
 # Delayed import; https://stackoverflow.com/questions/37471313/setup-requires-with-cython
 try:
