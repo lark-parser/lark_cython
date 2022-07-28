@@ -183,7 +183,7 @@ jobs:
     # ----
     - name: Publish to Test PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      if: ! startsWith(github.event.ref, 'refs/tags')
+      if: github.event_name == 'push' && ! startsWith(github.event.ref, 'refs/tags')
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         skip_existing: true
