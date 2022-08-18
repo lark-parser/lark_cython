@@ -10,7 +10,7 @@ Main differences from Lark's example code:
 
 - We use the _plugins option to override Lark's internal lexer+parser implementation
 
-- Since Tokens don't inherit from str, we have to explicitely use "token.value".
+- Since Tokens don't inherit from str, we have to explicitly use "token.value".
 
 """
 import sys
