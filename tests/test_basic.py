@@ -26,6 +26,8 @@ def test_lark_meta_propagation():
 		""")
 	tokens = res.children
 	assert isinstance(res, Tree)
+	assert res.meta.line == 2
+	assert res.meta.line == 3
 	assert all(isinstance(t, lark_cython.Token) for t in tokens)
 	assert all(hasattr(t, "__lark_meta__") for t in tokens)
 	assert all(t.__lark_meta__() == t for t in tokens)
