@@ -9,6 +9,26 @@ def test_minimal():
 	assert all(isinstance(t, lark_cython.Token) for t in res.children)
 	assert [t.value for t in res.children] == ['a', 'b']
 
+def test_lark_meta_propagation():
+	parser = Lark("""
+	    start: INT*
+
+	    COMMENT: /#.*/
+
+	    %import common (INT, WS)
+	    %ignore COMMENT
+	    %ignore WS
+	""", parser="lalr", _plugins=lark_cython.plugins, propagate_positions=True)
+	res = parser.parse("""
+		1 2 3  # hello
+		# world
+		4 5 6
+		""")
+	assert isinstance(res, Tree)
+	assert all(isinstance(t, lark_cython.Token) for t in res.children)
+	assert all(hasattr(t, "__lark_meta__") for t in res.children)
+	assert all(t.__lark_meta__() == t for t in res.children)
+
 def test_no_placeholders():
 	parser = Lark('!start: "a" ["b"]', parser='lalr', _plugins=lark_cython.plugins, maybe_placeholders=True)
 
