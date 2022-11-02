@@ -66,9 +66,11 @@ cdef class Token:
 
         return NotImplemented
 
-
     def __hash__(self):
         return hash(self.value)
+    
+    def __lark_meta__(self):
+        return self
 
 cdef class LexerState:
     __slots__ = 'text', 'line_ctr', 'last_token'
@@ -684,6 +686,9 @@ cdef class Tree:
 
     def __hash__(self) -> int:
         return hash((self.data, tuple(self.children)))
+
+    def __lark_meta__(self):
+        return self.meta
 
     def iter_subtrees(self) -> 'Iterator[Tree]':
         """Depth-first iteration.
