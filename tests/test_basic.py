@@ -1,4 +1,6 @@
+import pytest
 from lark import Lark, Tree
+from lark.exceptions import UnexpectedToken
 import lark_cython
 
 
@@ -77,3 +79,16 @@ def test_lexer_callbacks():
 	assert isinstance(res.children[0], lark_cython.Token)
 	assert isinstance(comments[0], lark_cython.Token)
 	assert len(comments) == 2
+
+def test_unexpected_token():
+	parser = Lark("""
+	    display_decimals: "DECIMALS"i WS INT
+		start: display_decimals
+	    %import common (INT, WS)
+	""", parser="lalr", _plugins=lark_cython.plugins)
+	with pytest.raises(UnexpectedToken) as err:
+		parser.parse("""
+	    	bla 
+	    	""")
+	assert str(err.value).startswith("Unexpected token Token('WS'")
+	
