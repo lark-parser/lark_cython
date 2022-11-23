@@ -41,4 +41,4 @@ License: MIT
 
 Author: [Erez Shinan](https://github.com/erezsh/)
 
-Special thanks goes to Datafold for commissioning the draft for lark-cython, and allowing me to relase it as open-source.
+Special thanks goes to [Datafold](https://github.com/datafold) for commissioning the draft for lark-cython, and allowing me to release it as open-source.
