@@ -4,11 +4,8 @@ build-backend = "setuptools.build_meta"
 
 
 [tool.cibuildwheel]
-build = "*p36-* *p37-* *p38-* *p39-* *p310-*"
+build = "*p36-* *p37-* *p38-* *p39-* *p310-* *p311-*"
 build-frontend = "build"
-#skip = "pp* *-musllinux_* *-win32"
 build-verbosity = 1
-#test-requires = [ "-r requirements/tests.txt",]
 test-requires = [ "pytest" ]
 test-command = "pytest {project}"
-#test-command = "python {project}/run_tests.py"
