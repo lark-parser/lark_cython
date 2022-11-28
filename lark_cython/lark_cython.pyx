@@ -24,7 +24,7 @@ cdef class Token:
     cdef public end_column
     cdef public end_pos
 
-    def __cinit__(self, str type_, str value, int start_pos, int line, int column, end_line=None, end_column=None, end_pos=None):
+    def __cinit__(self, str type_, str value, int start_pos=-1, int line=-1, int column=-1, end_line=None, end_column=None, end_pos=None):
         self.type = type_
         self.start_pos = start_pos
         self.value = value
@@ -381,6 +381,8 @@ cdef class LexerThread:
 
     def __copy__(self):
         return type(self)(self.lexer, copy(self.state))
+
+    _Token = Token
 
 ####
 
