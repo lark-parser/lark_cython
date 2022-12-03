@@ -361,12 +361,19 @@ cdef class ContextualLexer(Lexer):
             except UnexpectedCharacters:
                 raise e  # Raise the original UnexpectedCharacters. The root lexer raises it with the wrong expected set.
 
+    def lex(self, lexer_state: LexerState, parser_state: Any) -> Iterator[Token]:
+        try:
+            while True:
+                yield self.next_token(lexer_state, parser_state)
+        except EOFError:
+            pass
+
 
 cdef class LexerThread:
     """A thread that ties a lexer instance and a lexer state, to be used by the parser"""
 
     cdef Lexer lexer
-    cdef LexerState state
+    cdef public LexerState state
 
     def __init__(self, lexer, LexerState lexer_state):
         self.lexer = lexer
@@ -381,6 +388,9 @@ cdef class LexerThread:
 
     def __copy__(self):
         return type(self)(self.lexer, copy(self.state))
+
+    def lex(self, parser_state):
+        return self.lexer.lex(self.state, parser_state)
 
     _Token = Token
 
@@ -521,13 +531,13 @@ cdef class _Parser:
         return self.parse_from_state(parser_state)
     
 
-    cpdef parse_from_state(self, ParserState state):
+    cpdef parse_from_state(self, ParserState state, Token last_token = None):
         # Main LALR-parser loop
         cdef Token token
         cdef Token end_token
         
         try:
-            token = None
+            token = last_token
             #for token in state.lexer.lex(state):
             try:
                 while True:
