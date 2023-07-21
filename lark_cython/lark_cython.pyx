@@ -567,8 +567,8 @@ cdef class _Parser:
 
 
 class LALR_Parser(Serialize):
-    def __init__(self, parser_conf, debug=False):
-        analysis = LALR_Analyzer(parser_conf, debug=debug)
+    def __init__(self, parser_conf, debug=False, strict=False):
+        analysis = LALR_Analyzer(parser_conf, debug=debug, strict=strict)
         analysis.compute_lalr()
         callbacks = parser_conf.callbacks
 
