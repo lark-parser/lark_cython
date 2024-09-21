@@ -52,7 +52,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
+        # os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
+        os: ["ubuntu-latest", "macOS-latest"]
         cibw_skip: ["*-win32"]
         arch: [auto]
         include:
@@ -71,7 +72,7 @@ jobs:
       with:
         arch: x86
     - name: Build binary wheels
-      uses: pypa/cibuildwheel@v2.11.3
+      uses: pypa/cibuildwheel@v2.21.1
       with:
         output-dir: wheelhouse
         config-file: pyproject.toml
