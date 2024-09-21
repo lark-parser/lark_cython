@@ -52,7 +52,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
+        # os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
+        os: ["ubuntu-latest", "macOS-latest"]
         cibw_skip: ["*-win32"]
         arch: [auto]
         include:
