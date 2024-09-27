@@ -103,7 +103,7 @@ jobs:
         echo '############ FIND'
         find . -name .coverage.* || true
         find . -name coverage.xml  || true
-    - uses: codecov/codecov-action@v3
+    - uses: codecov/codecov-action@v4
       name: Codecov Upload
       with:
         file: ./tests/coverage.xml
