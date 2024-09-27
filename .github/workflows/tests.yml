@@ -42,7 +42,7 @@ jobs:
         python -m pytest --cov=$MOD_NAME $MOD_DPATH ../tests
         cd ..
     - name: Upload sdist artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: wheels
         path: ./wheelhouse/*.tar.gz
@@ -107,7 +107,7 @@ jobs:
       name: Codecov Upload
       with:
         file: ./tests/coverage.xml
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       name: Upload wheels artifact
       with:
         name: wheels
