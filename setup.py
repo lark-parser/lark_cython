@@ -38,7 +38,7 @@ setup(
     packages=find_packages(),
     ext_modules=cythonize("lark_cython/*.pyx"),  # accepts a glob pattern
     requires=["Cython"],
-    install_requires=["lark>=1.1.7", "cython>=0.29.1,<0.29.35", "Cython>=0.29,<0.30"],
+    install_requires=["lark>=1.1.7", "cython>=0.29,<0.30", "Cython>=0.29,<0.30"],
     setup_requires=["Cython"],
     author="Erez Shinan",
     author_email="lark@erezsh.com",
