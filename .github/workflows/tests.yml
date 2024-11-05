@@ -8,10 +8,10 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4.7.1
       with:
-        python-version: 3.8
+        python-version: "3.10"
     - name: Upgrade pip
       run: |-
         python -m pip install --upgrade pip
@@ -71,7 +71,7 @@ jobs:
       with:
         arch: x86
     - name: Build binary wheels
-      uses: pypa/cibuildwheel@v2.11.3
+      uses: pypa/cibuildwheel@v2.21.3
       with:
         output-dir: wheelhouse
         config-file: pyproject.toml
@@ -83,11 +83,11 @@ jobs:
     - name: Show built files
       shell: bash
       run: ls -la wheelhouse
-    - name: Set up Python 3.8 to combine coverage Linux
+    - name: Set up Python 3.10 to combine coverage Linux
       uses: actions/setup-python@v4.7.1
       if: runner.os == 'Linux'
       with:
-        python-version: 3.8
+        python-version: "3.10"
     - name: Combine coverage Linux
       if: runner.os == 'Linux'
       run: |-
