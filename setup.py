@@ -5,16 +5,7 @@ from setuptools import find_packages, setup
 
 # python .\setup.py build_ext --inplace
 
-
-# Delayed import; https://stackoverflow.com/questions/37471313/setup-requires-with-cython
-try:
-    from Cython.Build import cythonize
-except ImportError:
-
-    def cythonize(*args, **kwargs):
-        from Cython.Build import cythonize
-
-        return cythonize(*args, **kwargs)
+from Cython.Build import cythonize
 
 
 def parse_description():
