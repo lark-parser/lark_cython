@@ -38,8 +38,8 @@ setup(
     packages=find_packages(),
     ext_modules=cythonize("lark_cython/*.pyx"),  # accepts a glob pattern
     requires=["Cython"],
-    install_requires=["lark>=1.1.7", "cython>=3.0,<3.1", "Cython>=3.0,<3.1"],
-    setup_requires=["Cython"],
+    install_requires=["lark>=1.1.7"],
+    setup_requires=["Cython>=3.0,<3.1"],
     author="Erez Shinan",
     author_email="lark@erezsh.com",
     description="A Lark plugin that optimizes LALR parsing using Cython",
