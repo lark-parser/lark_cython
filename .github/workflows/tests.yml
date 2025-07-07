@@ -104,6 +104,7 @@ jobs:
         find . -name .coverage.* || true
         find . -name coverage.xml  || true
     - uses: codecov/codecov-action@v3
+      if: runner.os == 'Linux'
       name: Codecov Upload
       with:
         file: ./tests/coverage.xml
