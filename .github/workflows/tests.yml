@@ -42,9 +42,9 @@ jobs:
         python -m pytest --cov=$MOD_NAME $MOD_DPATH ../tests
         cd ..
     - name: Upload sdist artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: wheels
+        name: wheels-src
         path: ./wheelhouse/*.tar.gz
 
   build_binary_wheels:
@@ -53,21 +53,21 @@ jobs:
     strategy:
       matrix:
         os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
-        cibw_skip: ["*-win32"]
+        cibw_skip: ["win32"]
         arch: [auto]
         include:
         - os: windows-latest
           arch: auto
-          cibw_skip: '*-win_amd64'
+          cibw_skip: 'win_amd64'
     steps:
     - name: Checkout source
       uses: actions/checkout@v4
     - name: Enable MSVC 64bit
       uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && matrix.cibw_skip == '*-win32'
+      if: matrix.os == 'windows-latest' && matrix.cibw_skip == 'win32'
     - name: Enable MSVC 32bit
       uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && matrix.cibw_skip == '*-win_amd64'
+      if: matrix.os == 'windows-latest' && matrix.cibw_skip == 'win_amd64'
       with:
         arch: x86
     - name: Build binary wheels
@@ -78,7 +78,7 @@ jobs:
       env:
         CIBW_BUILD_VERBOSITY: 1
         #CIBW_TEST_COMMAND: pytest
-        CIBW_SKIP: ${{ matrix.cibw_skip }}
+        CIBW_SKIP: "*-${{ matrix.cibw_skip }}"
         CIBW_ARCHS_LINUX: ${{ matrix.arch }}
     - name: Show built files
       shell: bash
@@ -107,11 +107,12 @@ jobs:
       name: Codecov Upload
       with:
         file: ./tests/coverage.xml
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       name: Upload wheels artifact
       with:
-        name: wheels
+        name: wheels-${{ matrix.os }}-${{ matrix.cibw_skip }}
         path: ./wheelhouse/*.whl
+
 
   publish_wheels:
     name: Publish Wheels
@@ -121,11 +122,17 @@ jobs:
     - build_sdist
 
     steps:
+    - name: Merge wheels
+      uses: actions/upload-artifact/merge@v4
+      with:
+        name: wheels
+        pattern: wheels-*
+
     - name: Checkout source
       uses: actions/checkout@v4
 
     - name: Download wheels and sdist
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: wheels
         path: wheelhouse

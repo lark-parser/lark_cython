@@ -5,16 +5,7 @@ from setuptools import find_packages, setup
 
 # python .\setup.py build_ext --inplace
 
-
-# Delayed import; https://stackoverflow.com/questions/37471313/setup-requires-with-cython
-try:
-    from Cython.Build import cythonize
-except ImportError:
-
-    def cythonize(*args, **kwargs):
-        from Cython.Build import cythonize
-
-        return cythonize(*args, **kwargs)
+from Cython.Build import cythonize
 
 
 def parse_description():
@@ -38,8 +29,8 @@ setup(
     packages=find_packages(),
     ext_modules=cythonize("lark_cython/*.pyx"),  # accepts a glob pattern
     requires=["Cython"],
-    install_requires=["lark>=1.1.7", "cython>=3.0,<3.1", "Cython>=3.0,<3.1"],
-    setup_requires=["Cython"],
+    install_requires=["lark>=1.1.7"],
+    setup_requires=["Cython>=3.0,<3.1"],
     author="Erez Shinan",
     author_email="lark@erezsh.com",
     description="A Lark plugin that optimizes LALR parsing using Cython",
